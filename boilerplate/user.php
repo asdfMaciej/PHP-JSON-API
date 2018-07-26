@@ -37,7 +37,7 @@ class User {
 		$statement->execute();
 
 		if ($statement->rowCount() == 0) {
-			return False;
+			return "No matching users.";
 		}
 
 		$row = $statement->fetch(PDO::FETCH_ASSOC);  // we assume no collisions
@@ -50,7 +50,7 @@ class User {
 			$this->register_ip = $row["register_ip"];
 			$this->id = $row["id"];
 		}
-		return $row;
+		return True;
 	}
 
 	public function register() {
@@ -65,7 +65,7 @@ class User {
 		}
 
 		$similiar = $this->get_matching_user();
-		if ($similiar) {  // username or email collision
+		if ($similiar === True) {  // username or email collision
 			return "There's already an user with the same username or email.";
 		}
 

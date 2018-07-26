@@ -4,6 +4,6 @@
     <title>Wejdz w link</title>
 </head>
 <body>
-<a href="users\register.php">dupa</a>
+<a href="user\register.php">dupa</a>
 </body>
 </html>
