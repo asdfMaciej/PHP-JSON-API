@@ -5,6 +5,7 @@ function json_headers() {
 }
 
 function get_ip() {
+	/*
 	if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
 				$ip = $_SERVER['HTTP_CLIENT_IP'];
 		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -12,6 +13,8 @@ function get_ip() {
 		} else {
 				$ip = $_SERVER['REMOTE_ADDR'];
 		}
+	*/
+	$ip = $_SERVER['REMOTE_ADDR'];
 	return $ip;
 }
 
@@ -51,6 +54,14 @@ function post($id) {
 	} else {
 		return "";
 	}
+}
+
+function retrieve($method, $string) {
+	if ($method == "post") {
+		return post($string);
+	} elseif ($method == "get") {
+		return get($string);
+	} 
 }
 
 ?>
