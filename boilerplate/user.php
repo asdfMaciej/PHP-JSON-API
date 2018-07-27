@@ -4,12 +4,15 @@ class User {
 	private $table = "users";
 
 	public $id = -1;
-	public $active = 0;
-	public $admin = 0;
+	public $active = False;
+	public $admin = False;
 	public $email = "";
 	public $nick = "";
 	public $password = "";
 	public $register_ip = "";
+	public $register_timestamp = 0;
+	public $first_name = "";
+	public $last_name = "";
 	public $auth_token = "";
 
 	public function __construct($db) {
@@ -17,7 +20,7 @@ class User {
 	}
 
 	public function get_all() {
-		$query = "SELECT id, nick, email, register_ip, active, admin from $this->table";  // no password
+		$query = "SELECT * from $this->table";
 		$statement = $this->db->prepare($query);
 		$statement->execute();
 
@@ -27,6 +30,24 @@ class User {
 	public function get_all_rows() {
 		return $this->get_all()->fetchAll(PDO::FETCH_ASSOC);
 	}
+
+	private function change_row($key, $value, $noun) {  // it's a private function, so we don't escape $key
+		$query = "UPDATE $this->table SET $key = :value WHERE id = :id";
+		$statement = $this->db->prepare($query);
+		$statement->bindParam(':id', $this->id);
+		$statement->bindParam(':value', $value);
+		$statement->execute();
+
+		if ($statement->rowCount() == 0) {
+			return $noun . " has failed by affecting no-one. Perhaps has it already been done?";
+		}
+		return True;
+	}
+
+	public function activate() {return $this->change_row("active", 1, "Activation");}
+	public function deactivate() {return $this->change_row("active", 0, "Dectivation");}
+	public function give_admin() {return $this->change_row("admin", 1, "Giving admin permission");}
+	public function remove_admin() {return $this->change_row("admin", 0, "Removing admin permission");}
 
 	public function get_matching_user($self_assign=False) {
 		$query = "SELECT * from $this->table WHERE email = :email OR nick = :nick OR id = :id";
@@ -49,6 +70,9 @@ class User {
 			$this->password = $row["password"];
 			$this->register_ip = $row["register_ip"];
 			$this->id = $row["id"];
+			$this->register_timestamp = $row["register_timestamp"];
+			$this->first_name = $row["first_name"];
+			$this->last_name = $row["last_name"];
 		}
 		return True;
 	}
@@ -59,6 +83,8 @@ class User {
 		$valid = $valid && validate_name($this->nick);
 		$valid = $valid && validate_password($this->password);
 		$valid = $valid && validate_ip($this->register_ip);
+		$valid = $valid && validate_fname($this->first_name);
+		$valid = $valid && validate_fname($this->last_name);
 
 		if (!$valid) {
 			return "Validation wasn't successful.";
@@ -70,15 +96,21 @@ class User {
 		}
 
 		$this->password = password_hash($this->password, PASSWORD_DEFAULT);
+		$this->register_timestamp = date_timestamp_get(date_create());
 
-		$query = "INSERT INTO $this->table (nick, password, email, register_ip) VALUES ";
-		$query .= "(:nick, :password, :email, :register_ip)";
+		$query = "INSERT INTO $this->table "
+				. "(nick, password, email, register_ip, register_timestamp, first_name, last_name)"
+				. " VALUES "
+				. "(:nick, :password, :email, :register_ip, :register_timestamp, :first_name, :last_name)";
 
 		$statement = $this->db->prepare($query);
 		$statement->bindParam(':nick', $this->nick);
 		$statement->bindParam(':password', $this->password);
 		$statement->bindParam(':email', $this->email);
 		$statement->bindParam(':register_ip', $this->register_ip);
+		$statement->bindParam(':register_timestamp', $this->register_timestamp);
+		$statement->bindParam(':first_name', $this->first_name);
+		$statement->bindParam(':last_name', $this->last_name);
 
 		$statement->execute();
 		return True;

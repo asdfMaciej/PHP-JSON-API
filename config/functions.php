@@ -20,14 +20,23 @@ function get_ip() {
 
 function validate_name($name) {
 	$name = trim($name);  // strip() from Python, removes trailing and prequeling whitespace
-	$reg_pl = "/^[a-zA-ZąĄćĆęĘłŁŃńÓóśŚźŹŻż ]*/";
+	$reg_pl = "/^[a-zA-ZąĄćĆęĘłŁŃńÓóśŚźŹŻż\-_0-9$#%@!%\^&\*]*/";
 	$valid = True;
-	if (!preg_match($reg_pl, $name) or strlen($name) > 28 or strlen($name) < 3) {
+	if (!preg_match($reg_pl, $name) or strlen($name) > 16 or strlen($name) < 3) {
 		$valid = False;
 	}
 	return $valid;
 }
 
+function validate_fname($name) {
+	$name = trim($name);
+	$reg_pl = "/^[a-zA-ZąĄćĆęĘłŁŃńÓóśŚźŹŻż ]*/";
+	$valid = True;
+	if (!preg_match($reg_pl, $name) or strlen($name) > 16 or strlen($name) < 3) {
+		$valid = False;
+	}
+	return $valid;
+}
 function validate_password($password) {
 	return strlen($password) <= 32 && strlen($password) >= 6;
 }
@@ -64,4 +73,7 @@ function retrieve($method, $string) {
 	} 
 }
 
+function json($str) {
+	return json_encode($str, JSON_UNESCAPED_SLASHES);
+}
 ?>

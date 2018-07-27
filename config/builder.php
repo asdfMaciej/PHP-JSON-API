@@ -42,7 +42,7 @@ class ResponseBuilder {
 		header("Content-Type: application/json");
 		http_response_code($this->response_code);
 
-		return json_encode($this->response);
+		return json($this->response);
 	}
 	
 }
@@ -79,6 +79,19 @@ class Authentication {
 		return $token;
 	}
 
+	public function delete_session($token) {
+		$query = "DELETE FROM $this->table WHERE token = :token";
+		$statement = $this->db->prepare($query);
+		$statement->bindParam(':token', $token);
+		$statement->execute();
+
+		$affected = $statement->rowCount();
+		if ($affected > 0) {
+			return True;
+		}
+		return False;
+	}
+
 	public function verify_token($token) {
 		$timestamp = date_timestamp_get(date_create());
 
@@ -99,6 +112,30 @@ class Authentication {
 	}
 }
 
+class Logger {
+	private $db;
+	private $table = "logs";
+	public $api_call;
+	public $uid = -1;
+	public $ip;
+
+	public function __construct($db) {
+		$this->db = $db;
+	}
+
+	public function log($success) {
+		$timestamp = date_timestamp_get(date_create());
+		$query = "INSERT INTO $this->table (uid, api_call, ip, timestamp, success) VALUES "
+				. "(:uid, :api_call, :ip, :timestamp, :success)";
+		$statement = $this->db->prepare($query);
+		$statement->bindParam(':uid', $this->uid);
+		$statement->bindParam(':api_call', $this->api_call);
+		$statement->bindParam(':ip', $this->ip);
+		$statement->bindParam(':timestamp', $timestamp);
+		$statement->bindParam(':success', $success);
+		$statement->execute();
+	}
+}
 class APIBuilder {
 	public $database;
 	public $response_builder;
@@ -108,15 +145,18 @@ class APIBuilder {
 	public $require_active = 0;
 	public $require_admin = 0;
 
-	private $token = "";
+	protected $token = "";
+	protected $get_method = "get";
+	protected $auth_user;
+
 	private $token_get = "token";
-	private $get_method = "get";
-	private $auth_user;
+	private $call_name;
 
 	public function __construct() {
 		$this->database = (new DBClass)->getConnection();
 		$this->response_builder = new ResponseBuilder();
 		$this->authentication = new Authentication($this->database);
+		$this->logger = new Logger($this->database);
 	}
 
 	public function retrieve($field) {
@@ -131,27 +171,35 @@ class APIBuilder {
 			return False;  // I won't just set require token to 1 in order to avoid ambigous situations
 		}
 
+		$this->logger->api_call = get_class($this);  // returns name of the child class it's called from
+		$this->logger->ip = get_ip();
 		$this->token = $this->retrieve($this->token_get);
 		if ($this->require_token) {
 			$token_uid = $this->authentication->verify_token($this->token);
 			if (!$token_uid) {
 				echo $this->response_builder->generate_and_set(401, "Invalid or unprovided token.");
+				$this->logger->log(False);
 				return False;
 			}
 			$this->auth_user = new User($this->database);
 			$this->auth_user->id = $token_uid;
 			$this->auth_user->get_matching_user(True);
 
+			$this->logger->uid = $this->auth_user->id;
+
 			if (intval($this->auth_user->active) == 0 && $this->require_active) {
 				echo $this->response_builder->generate_and_set(401, "Inactive account.");
+				$this->logger->log(False);
 				return False;
 			}
 			if (intval($this->auth_user->admin) == 0 && $this->require_admin) {
 				echo $this->response_builder->generate_and_set(403, "Administrator permission required.");
+				$this->logger->log(False);
 				return False;
 			}
 		}
 
+		$this->logger->log(True);
 		return True;
 	}
 }

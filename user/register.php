@@ -9,6 +9,8 @@ class Register extends APIBuilder {
 	private $email_get = "email";
 	private $nick_get = "nick";
 	private $password_get = "password";
+	private $first_name_get = "first_name";
+	private $last_name_get = "last_name";
 
 	public function __construct() {
 		parent::__construct();
@@ -27,6 +29,8 @@ class Register extends APIBuilder {
 		$user->email = $this->retrieve($this->email_get);
 		$user->nick = $this->retrieve($this->nick_get);
 		$user->password = $this->retrieve($this->password_get);
+		$user->first_name = $this->retrieve($this->first_name_get);
+		$user->last_name = $this->retrieve($this->last_name_get);
 		$user->register_ip = get_ip();
 
 		$registered = $user->register();
