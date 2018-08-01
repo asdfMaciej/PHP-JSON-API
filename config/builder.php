@@ -136,6 +136,7 @@ class Logger {
 		$statement->execute();
 	}
 }
+
 class APIBuilder {
 	public $database;
 	public $response_builder;
@@ -188,7 +189,7 @@ class APIBuilder {
 			$this->logger->uid = $this->auth_user->id;
 
 			if (intval($this->auth_user->active) == 0 && $this->require_active) {
-				echo $this->response_builder->generate_and_set(401, "Inactive account.");
+				echo $this->response_builder->generate_and_set(405, "Inactive account.");
 				$this->logger->log(False);
 				return False;
 			}
