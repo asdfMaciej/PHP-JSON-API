@@ -1,11 +1,15 @@
 <?php
+namespace API\User;
+use Boilerplate\User;
+use \PDO;
+
 include_once "../config/database.php";
 include_once "../config/functions.php";
 include_once "../config/builder.php";
 include_once "../boilerplate/user.php";
 
 
-class ListUsers extends APIBuilder {
+class ListUsers extends \APIBuilder {
 	public function __construct() {
 		parent::__construct();
 		$this->require_token = 1;
@@ -19,7 +23,7 @@ class ListUsers extends APIBuilder {
 	}
 
 	public function run() {
-		$user = new User($this->database);
+		$user = new User($this->database_class);
 		$list = $user->get_all_rows();
 		echo $this->response_builder->generate_and_set(200, "Request completed", $list);
 	}

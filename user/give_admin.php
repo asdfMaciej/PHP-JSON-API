@@ -1,11 +1,15 @@
 <?php
+namespace API\User;
+use Boilerplate\User;
+use \PDO;
+
 include_once "../config/database.php";
 include_once "../config/functions.php";
 include_once "../config/builder.php";
 include_once "../boilerplate/user.php";
 
 
-class GiveAdmin extends APIBuilder {
+class GiveAdmin extends \APIBuilder {
 	private $uid_get = "uid";
 
 	public function __construct() {
@@ -21,7 +25,7 @@ class GiveAdmin extends APIBuilder {
 	}
 
 	public function run() {
-		$user = new User($this->database);
+		$user = new User($this->database_class);
 		$user->id = $this->retrieve($this->uid_get);
 
 		$data = [];

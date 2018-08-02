@@ -1,10 +1,15 @@
 <?php
+namespace Boilerplate;
+
 class Friendship {
 	private $db;
-	private $table = "friendships";
+	private $db_class;
+	private $table;
 
 	public function __construct($db) {
-		$this->db = $db;
+		$this->db_class = $db;
+		$this->db = $this->db_class->getConnection();
+		$this->table = $this->db_class->get_table_name("friendships");
 	}
 
 	public function get_all() {

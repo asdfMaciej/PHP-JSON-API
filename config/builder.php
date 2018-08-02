@@ -48,11 +48,14 @@ class ResponseBuilder {
 }
 class Authentication {
 	private $db;
-	private $table = "sessions";
+	private $db_class;
+	private $table;
 	private $session_expire = 31556926;  // seconds in 1 year 
 
 	public function __construct($db) {
-		$this->db = $db;
+		$this->db_class = $db;
+		$this->db = $this->db_class->getConnection();
+		$this->table = $this->db_class->get_table_name("authentication");
 	}
 
 	public function get_all() {
@@ -114,13 +117,17 @@ class Authentication {
 
 class Logger {
 	private $db;
-	private $table = "logs";
+	private $db_class;
+	private $table;
+
 	public $api_call;
 	public $uid = -1;
 	public $ip;
 
 	public function __construct($db) {
-		$this->db = $db;
+		$this->db_class = $db;
+		$this->db = $this->db_class->getConnection();
+		$this->table = $this->db_class->get_table_name("logs");
 	}
 
 	public function log($success) {
@@ -139,6 +146,7 @@ class Logger {
 
 class APIBuilder {
 	public $database;
+	public $database_class;
 	public $response_builder;
 	public $authentication;
 
@@ -154,10 +162,11 @@ class APIBuilder {
 	private $call_name;
 
 	public function __construct() {
-		$this->database = (new DBClass)->getConnection();
+		$this->database_class = new DBClass();
+		$this->database = $this->database_class->getConnection();
 		$this->response_builder = new ResponseBuilder();
-		$this->authentication = new Authentication($this->database);
-		$this->logger = new Logger($this->database);
+		$this->authentication = new Authentication($this->database_class);
+		$this->logger = new Logger($this->database_class);
 	}
 
 	public function retrieve($field) {

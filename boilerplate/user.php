@@ -1,7 +1,10 @@
 <?php
+namespace Boilerplate;
+
 class User {
 	private $db;
-	private $table = "users";
+	private $db_class;
+	private $table;
 
 	public $id = -1;
 	public $active = False;
@@ -16,7 +19,9 @@ class User {
 	public $auth_token = "";
 
 	public function __construct($db) {
-		$this->db = $db;
+		$this->db_class = $db;
+		$this->db = $this->db_class->getConnection();
+		$this->table = $this->db_class->get_table_name("friendships");
 	}
 
 	public function get_all() {

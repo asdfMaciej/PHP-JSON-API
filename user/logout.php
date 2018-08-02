@@ -1,11 +1,15 @@
 <?php
+namespace API\User;
+use Boilerplate\User;
+use \PDO;
+
 include_once "../config/database.php";
 include_once "../config/functions.php";
 include_once "../config/builder.php";
 include_once "../boilerplate/user.php";
 
 
-class Logout extends APIBuilder {
+class Logout extends \APIBuilder {
 	public function __construct() {
 		parent::__construct();
 		$this->require_token = 1;

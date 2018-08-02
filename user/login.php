@@ -1,11 +1,15 @@
 <?php
+namespace API\User;
+use Boilerplate\User;
+use \PDO;
+
 include_once "../config/database.php";
 include_once "../config/functions.php";
 include_once "../config/builder.php";
 include_once "../boilerplate/user.php";
 
 
-class Login extends APIBuilder {
+class Login extends \APIBuilder {
 	private $login_get = "login";  // username or nickname
 	private $password_get = "password";
 
@@ -22,7 +26,7 @@ class Login extends APIBuilder {
 	}
 
 	public function run() {
-		$user = new User($this->database);
+		$user = new User($this->database_class);
 		$user->email = $this->retrieve($this->login_get);
 		$user->nick = $this->retrieve($this->login_get);
 

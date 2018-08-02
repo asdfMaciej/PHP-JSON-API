@@ -1,25 +1,39 @@
 <?php
 class DBClass {
-    private $host = "localhost";
-    private $username = "root";
-    private $password = "";
-    private $database = "website";
+	/*
+		TO-DO:
+		Store the credentials somewhere else.
+		Don't have to worry about that so far, because it's on localhost.
+	*/
+	public $connection;
 
-    public $connection;
+	protected $table_names = [
+		"users" => "users",
+		"friendships" => "friendships",
+		"authentication" => "sessions",
+		"logs" => "logs"
+	];
 
-    // get the database connection
-    public function getConnection(){
+	private $host = "localhost";
+	private $username = "root";
+	private $password = "";
+	private $database = "website";
 
-        $this->connection = null;
+	public function getConnection() {
+		$this->connection = null;
+		try {
+			$call = "mysql:host=" . $this->host . ";dbname=" . $this->database;
+			$this->connection = new PDO($call, $this->username, $this->password);
+			$this->connection->exec("set names utf8");
+		} catch(PDOException $exception) {
+			echo "Error: " . $exception->getMessage();
+		}
 
-        try{
-            $this->connection = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->database, $this->username, $this->password);
-            $this->connection->exec("set names utf8");
-        }catch(PDOException $exception){
-            echo "Error: " . $exception->getMessage();
-        }
+		return $this->connection;
+	}
 
-        return $this->connection;
-    }
+	public function get_table_name($name) {
+		return $this->table_names[$name];
+	}
 }
 ?>

@@ -1,11 +1,15 @@
 <?php
+namespace API\Friends;
+use Boilerplate\Friendship;
+use \PDO;
+
 include_once "../config/database.php";
 include_once "../config/functions.php";
 include_once "../config/builder.php";
 include_once "../boilerplate/friendship.php";
 
 
-class Friends extends APIBuilder {
+class Friends extends \APIBuilder {
 	public function __construct() {
 		parent::__construct();
 		$this->require_token = 0;
@@ -19,7 +23,7 @@ class Friends extends APIBuilder {
 	}
 
 	public function run() {
-		$user = new Friendship($this->database);
+		$user = new Friendship($this->database_class);
 		$result = $user->create_friendship(1, 0);
 		$list = $user->get_user_friendships(1)->fetchAll(PDO::FETCH_ASSOC);
 
