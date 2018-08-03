@@ -14,6 +14,37 @@ class DBClass {
 		"logs" => "logs"
 	];
 
+	protected $table_user_columns = [
+		"users" => [
+			"id", "nick", "email", "active", "first_name", "last_name"
+		],
+		"friendships" => [
+			"id", "uid1", "uid2", "create_timestamp", "relationship"
+		],
+		"authentication" => [
+			"uid", "token", "expire"
+		],
+		"logs" => [
+			"id", "uid", "timestamp"
+		]
+	];
+
+	protected $table_columns = [
+		"users" => [
+			"id", "nick", "password", "email", "register_ip", 
+			"active", "admin", "first_name", "last_name"
+		],
+		"friendships" => [
+			"id", "uid1", "uid2", "create_timestamp", "relationship"
+		],
+		"authentication" => [
+			"uid", "token", "expire"
+		],
+		"logs" => [
+			"id", "uid", "api_call", "ip", "success", "timestamp"
+		]
+	];
+
 	private $host = "localhost";
 	private $username = "root";
 	private $password = "";
@@ -32,8 +63,28 @@ class DBClass {
 		return $this->connection;
 	}
 
-	public function get_table_name($name) {
-		return $this->table_names[$name];
+	public function get_table_name($table) {
+		return $this->table_names[$table];
+	}
+
+	public function get_table_columns($table, $prefix=False) {
+		$ret = $this->table_columns[$table];
+		if ($prefix) {
+			foreach ($ret as &$val) {
+				$val = $table . "." . $val; // for joining tables
+			}
+		}
+		return $ret;
+	}
+
+	public function get_table_user_columns($table, $prefix=False) {
+		$ret = $this->table_user_columns[$table];
+		if ($prefix) {
+			foreach ($ret as &$val) {
+				$val = $table . "." . $val;
+			}
+		}
+		return $ret;
 	}
 }
 ?>

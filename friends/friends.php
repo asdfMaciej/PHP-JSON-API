@@ -23,14 +23,26 @@ class Friends extends \APIBuilder {
 	}
 
 	public function run() {
-		$user = new Friendship($this->database_class);
-		$result = $user->create_friendship(1, 0);
-		$list = $user->get_user_friendships(1)->fetchAll(PDO::FETCH_ASSOC);
+		$f = new Friendship($this->database_class);
+		$friends_col = $this->database_class->get_table_user_columns("friendships", True);
+		$friends_table = $this->database_class->get_table_name("friendships");
+		$users_col = $this->database_class->get_table_user_columns("users", True);
+		$users_table = $this->database_class->get_table_name("users");
 
-		var_dump($list);
-		var_dump($result);
+		$query = "SELECT "
+				. implode(", ", $friends_col) . ", "
+				. implode(", ", $users_col)
+				. " FROM $friends_table "
+				. " INNER JOIN $users_table ON "
+				. "$users_table.id = $friends_table.uid2 "
+				. " WHERE $friends_table.uid1 = 1";
 
-		echo $this->response_builder->generate_and_set(200, "Request completed", $list);
+		$statement = $this->database->prepare($query);
+		$statement->execute();
+
+		$list = $statement->fetchAll(PDO::FETCH_ASSOC);
+		echo $query;
+		//echo $this->response_builder->generate_and_set(200, "Request completed", $list);
 	}
 }
 

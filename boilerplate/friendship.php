@@ -1,5 +1,6 @@
 <?php
 namespace Boilerplate;
+use \PDO;
 
 class Friendship {
 	private $db;

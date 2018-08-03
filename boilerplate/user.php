@@ -1,5 +1,7 @@
 <?php
 namespace Boilerplate;
+use \PDO;
+
 
 class User {
 	private $db;
@@ -21,7 +23,7 @@ class User {
 	public function __construct($db) {
 		$this->db_class = $db;
 		$this->db = $this->db_class->getConnection();
-		$this->table = $this->db_class->get_table_name("friendships");
+		$this->table = $this->db_class->get_table_name("users");
 	}
 
 	public function get_all() {

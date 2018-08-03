@@ -1,6 +1,7 @@
 <?php
 include_once "../config/database.php";
 include_once "../config/functions.php";
+use Boilerplate\User;
 
 
 class ResponseBuilder {
@@ -191,7 +192,7 @@ class APIBuilder {
 				$this->logger->log(False);
 				return False;
 			}
-			$this->auth_user = new User($this->database);
+			$this->auth_user = new User($this->database_class);
 			$this->auth_user->id = $token_uid;
 			$this->auth_user->get_matching_user(True);
 
