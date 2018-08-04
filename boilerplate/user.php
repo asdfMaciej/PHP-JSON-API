@@ -84,6 +84,32 @@ class User {
 		return True;
 	}
 
+	public function get_friends() {
+		if ($this->id == -1) {
+			return False;
+		}
+
+		$friends_col = $this->db_class->get_table_user_columns("friendships", True);
+		$users_col = $this->db_class->get_table_user_columns("users", True);
+		$friends_table = $this->db_class->get_table_name("friendships");
+		$users_table = $this->table;
+
+		$query = "SELECT "
+				. "$friends_table.relationship, $friends_table.create_timestamp, "
+				. implode(", ", $users_col)
+				. " FROM $friends_table "
+				. " INNER JOIN $users_table ON "
+				. "$users_table.id = $friends_table.uid2 "
+				. " WHERE $friends_table.uid1 = :uid "
+				. " AND relationship = \"Friendship\"";
+
+		$statement = $this->db->prepare($query);
+		$statement->bindParam(':uid', $this->id);	
+		$statement->execute();
+
+		return $statement;
+	}
+
 	public function register() {
 		$valid = True;
 		$valid = $valid && validate_email($this->email);

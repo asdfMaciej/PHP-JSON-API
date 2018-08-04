@@ -25,12 +25,12 @@ class Profile extends \APIBuilder {
 	}
 
 	public function run() {
-		$user = new User($this->database_class);
 		$uid = $this->retrieve($this->uid_get);
 		if ($uid == "") {
 			$uid = $this->auth_user->id;
 		}
 
+		$user = new User($this->database_class);
 		$user->id = $uid;
 		$exists = $user->get_matching_user(True);
 

@@ -11,7 +11,8 @@ class DBClass {
 		"users" => "users",
 		"friendships" => "friendships",
 		"authentication" => "sessions",
-		"logs" => "logs"
+		"logs" => "logs",
+		"requests" => "requests"
 	];
 
 	protected $table_user_columns = [
@@ -26,6 +27,9 @@ class DBClass {
 		],
 		"logs" => [
 			"id", "uid", "timestamp"
+		],
+		"requests" => [
+			"id", "uid_sender", "uid_receiver", "create_timestamp", "relationship"
 		]
 	];
 
@@ -42,6 +46,9 @@ class DBClass {
 		],
 		"logs" => [
 			"id", "uid", "api_call", "ip", "success", "timestamp"
+		],
+		"requests" => [
+			"id", "uid_sender", "uid_receiver", "create_timestamp", "relationship"
 		]
 	];
 
