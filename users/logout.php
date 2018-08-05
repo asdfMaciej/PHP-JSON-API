@@ -1,5 +1,5 @@
 <?php
-namespace API\User;
+namespace API\Users;
 use Boilerplate\User;
 use \PDO;
 

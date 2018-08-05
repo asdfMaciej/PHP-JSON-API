@@ -1,5 +1,5 @@
 <?php
-namespace API\Friends;
+namespace API\Requests;
 
 use Boilerplate\Friendship;
 use Boilerplate\Request;

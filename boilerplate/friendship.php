@@ -48,11 +48,6 @@ class Friendship {
 	} 
 
 	public function create_friendship($uid1, $uid2, $relationship="Friendship") {
-		/*
-		TO-DO:
-			Verify if IDs are legitimate
-			yeah, I probably should check it there
-		*/
 		if ($uid1 == $uid2) {
 			return "User IDs cannot be identical.";
 		}
@@ -83,10 +78,6 @@ class Friendship {
 	}
 
 	public function remove_friendship($uid1, $uid2, $relationship="Friendship") {
-		/*
-		TO-DO:
-			Again, verify the IDs. Figure whether I should import User from there
-		*/
 		if ($uid1 == $uid2) {
 			return "User IDs cannot be identical.";
 		}

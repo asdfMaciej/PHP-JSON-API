@@ -1,5 +1,5 @@
 <?php
-namespace API\User;
+namespace API\Users;
 use Boilerplate\User;
 use \PDO;
 
@@ -45,6 +45,7 @@ class Profile extends \APIBuilder {
 			if ($this->auth_user->id == $user->id || $this->auth_user->admin == 1) {
 				$data["email"] = $user->email;
 				$data["admin"] = $user->admin;
+				$data["friends"] = $user->get_friends()->fetchAll(PDO::FETCH_ASSOC);
 			}
 			$message = "Profile data acquired.";
 			$code = 200;

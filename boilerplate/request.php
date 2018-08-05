@@ -88,13 +88,6 @@ class Request {
 	}
 
 	public function create_request($uid_sender, $uid_receiver, $relationship="Friendship") {
-		/*
-		TO-DO:
-			Verify if IDs are legitimate
-			Check if friendship already exists
-			Perhaps disable mirror requests and insta create friendship
-			^ would create cross-dependency though
-		*/
 		if ($uid_sender == $uid_receiver) {
 			return "User IDs cannot be identical.";
 		}
