@@ -46,7 +46,7 @@ class User {
 		$statement->execute();
 
 		if ($statement->rowCount() == 0) {
-			return $noun . " has failed by affecting no-one. Perhaps has it already been done?";
+			return $noun . " has failed - invalid request provided.";
 		}
 		return True;
 	}

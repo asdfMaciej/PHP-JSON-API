@@ -119,5 +119,26 @@ class Request {
 		return True;
 	}
 
+	public function remove_request($uid_sender, $uid_receiver, $relationship="Friendship") {
+		if ($uid_sender == $uid_receiver) {
+			return "User IDs cannot be identical.";
+		} 
+
+		$query = "DELETE FROM $this->table "
+				. " WHERE uid_sender = :uid_sender AND uid_receiver = :uid_receiver "
+				. " AND relationship = :relationship";
+		$statement = $this->db->prepare($query);
+		$statement->bindParam(':uid_sender', $uid_sender);
+		$statement->bindParam(':uid_receiver', $uid_receiver);
+		$statement->bindParam(':relationship', $relationship);
+		$statement->execute();
+
+		if ($statement->rowCount() == 0) {
+			return "Invalid request provided.";
+		}
+
+		return True;
+	}
+
 }
 ?>
