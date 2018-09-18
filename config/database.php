@@ -36,7 +36,7 @@ class DBClass {
 	protected $table_columns = [
 		"users" => [
 			"id", "nick", "password", "email", "register_ip", 
-			"active", "admin", "first_name", "last_name"
+			"active", "admin", "first_name", "last_name", "register_timestamp"
 		],
 		"friendships" => [
 			"id", "uid1", "uid2", "create_timestamp", "relationship"

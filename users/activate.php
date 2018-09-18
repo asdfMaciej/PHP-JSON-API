@@ -3,10 +3,10 @@ namespace API\Users;
 use Boilerplate\User;
 use \PDO;
 
-include_once "../config/database.php";
-include_once "../config/functions.php";
-include_once "../config/builder.php";
-include_once "../boilerplate/user.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/config/database.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/config/functions.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/config/builder.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/boilerplate/user.php";
 
 
 class Activate extends \APIBuilder {

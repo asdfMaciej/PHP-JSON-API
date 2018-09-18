@@ -3,12 +3,12 @@ namespace API\Friends;
 use Boilerplate\Friendship;
 use \PDO;
 
-include_once "../config/database.php";
-include_once "../config/functions.php";
-include_once "../config/builder.php";
-include_once "../boilerplate/friendship.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/config/database.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/config/functions.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/config/builder.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/boilerplate/friendship.php";
 
-include_once "../boilerplate/user.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/boilerplate/user.php";
 use Boilerplate\User;
 
 class ListFriends extends \APIBuilder {

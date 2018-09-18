@@ -1,10 +1,13 @@
 <?php
-include_once "../config/database.php";
-include_once "../config/functions.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/config/database.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/config/functions.php";
 use Boilerplate\User;
 
+interface ResponseBuilderInterface {
+	public function generate();
+}
 
-class ResponseBuilder {
+class ResponseBuilder implements ResponseBuilderInterface {
 	private $response = [
 		"data" => [], 
 		"status" => [
@@ -159,8 +162,8 @@ class APIBuilder {
 	protected $get_method = "get";
 	protected $auth_user;
 
-	private $token_get = "token";
-	private $call_name;
+	protected $token_get = "token";
+	protected $call_name;
 
 	public function __construct() {
 		$this->database_class = new DBClass();
@@ -174,6 +177,36 @@ class APIBuilder {
 		return retrieve($this->get_method, $field);  // from functions.php, get or post
 	}
 
+	protected function authenticate()  {
+		$this->token = $this->retrieve($this->token_get);
+		$token_uid = $this->authentication->verify_token($this->token);
+
+		if (!isset($this->auth_user) || $this->auth_user->id ?? "" != $token_uid) {
+ 			$this->auth_user = new User($this->database_class);
+			$this->auth_user->id = $token_uid;
+		}
+
+		$res = $this->auth_user->get_matching_user(True);
+		if ($res !== True) {
+			unset($this->auth_user);
+		}
+
+		if ($this->require_token) {
+			if (!$token_uid) {
+				return [401, "Invalid or unprovided token."];
+			}
+			$this->logger->uid = $this->auth_user->id;
+
+			if (intval($this->auth_user->active) == 0 && $this->require_active) {
+				return [405, "Inactive account."];
+			}
+			if (intval($this->auth_user->admin) == 0 && $this->require_admin) {
+				return [403, "Administrator permission required."];
+			}
+		}
+		return True;
+	}
+
 	public function init() {
 		$invalid_config = $this->require_admin && !$this->require_token;
 		$invalid_config = $invalid_config || ($this->require_active && !$this->require_token);
@@ -184,34 +217,225 @@ class APIBuilder {
 
 		$this->logger->api_call = get_class($this);  // returns name of the child class it's called from
 		$this->logger->ip = get_ip();
-		$this->token = $this->retrieve($this->token_get);
-		if ($this->require_token) {
-			$token_uid = $this->authentication->verify_token($this->token);
-			if (!$token_uid) {
-				echo $this->response_builder->generate_and_set(401, "Invalid or unprovided token.");
-				$this->logger->log(False);
-				return False;
-			}
-			$this->auth_user = new User($this->database_class);
-			$this->auth_user->id = $token_uid;
-			$this->auth_user->get_matching_user(True);
-
-			$this->logger->uid = $this->auth_user->id;
-
-			if (intval($this->auth_user->active) == 0 && $this->require_active) {
-				echo $this->response_builder->generate_and_set(405, "Inactive account.");
-				$this->logger->log(False);
-				return False;
-			}
-			if (intval($this->auth_user->admin) == 0 && $this->require_admin) {
-				echo $this->response_builder->generate_and_set(403, "Administrator permission required.");
-				$this->logger->log(False);
-				return False;
-			}
+		$auth = $this->authenticate();
+		if ($auth !== True) {
+			echo $this->response_builder->generate_and_set($auth[0], $auth[1]);
+			$this->logger->log(False);
+			return False;
 		}
 
 		$this->logger->log(True);
 		return True;
+	}
+}
+
+class WebBuilder extends APIBuilder {
+	public $title = "Memy na Leśnej 3";
+	public $top_message = "";
+	public $top_message_code = 200;
+
+	protected $f_head = "head.php";
+	protected $f_header_msg = "header_message.php";
+	protected $f_header = "header.php";
+	protected $f_foot = "foot.php";
+	protected $f_footer = "footer.php";
+
+	public function __construct() {
+		parent::__construct();
+		$this->response_builder = new TemplateBuilder();
+	}
+
+	public function retrieve($field, $force_post=False) {
+		$supplied = retrieve($this->get_method, $field);
+		//if ($supplied == "") {
+		//	$supplied = $_COOKIE[$field] ?? "";
+		//}
+		if ($supplied == "" && !$force_post) {
+			$supplied = $_SESSION[$field] ?? "";
+		}
+		return $supplied;
+	}
+
+	public function set($field, $value="") {
+		$_SESSION[$field] = $value;
+	}
+
+	public function exists($field) {
+		return isset($_SESSION[$field]);
+	}
+
+	public function get_user() {
+		return $this->auth_user ?? False;
+	}
+
+	protected function can_access() {
+		$invalid_config = $this->require_admin && !$this->require_token;
+		$invalid_config = $invalid_config || ($this->require_active && !$this->require_token);
+		if ($invalid_config) {  // if requires active||admin, then it needs to require token
+			return False;  // I won't just set require token to 1 in order to avoid ambigous situations
+		}
+
+		$this->logger->api_call = get_class($this);  // returns name of the child class it's called from
+		$this->logger->ip = get_ip();
+		$auth = $this->authenticate();
+		if ($auth !== True) {
+			$this->logger->log(False);
+			return False;
+		}
+
+		$this->logger->log(True);
+		return True;
+	}
+
+	public function init($force_auth_user=False) {
+		if ($force_auth_user) {
+			$this->auth_user = $force_auth_user;
+		}
+		$ret_val = $this->can_access();
+		$this->response_builder->add_template($this->f_head, [
+			"title" => $this->title,
+			"stylesheets" => [
+				"../style/style.css"
+			]
+		]);
+
+		if ($this->top_message) {
+			$this->response_builder->add_template($this->f_header_msg, [
+				"message" => $this->top_message,
+				"code" => $this->top_message_code,
+			]);
+		}
+
+		$logged_in = isset($this->auth_user);
+		if ($logged_in) {
+			$user = $this->auth_user;
+		} else {
+			$user = False;
+		}
+
+		$this->response_builder->add_template($this->f_header, [
+			"fname" => "Maciej",
+			"lname" => "Kaszkowiak",
+			"user" => $user
+		]);
+
+		if ($ret_val == False) {
+			$this->response_builder->add_template("403.php", []);
+			$this->render();
+		}
+		return $ret_val;
+	}
+
+	public function set_title($t) {
+		$this->title = $t;
+	}
+
+	public function render() {
+		$this->response_builder->add_template($this->f_footer, [
+			"footer" => "Wielosztuki w Żabce"
+		]);
+		$this->response_builder->add_template($this->f_foot, []);
+		$this->response_builder->generate();
+	}
+
+	public function handle_actions($reference) {
+		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+			return False;
+		}
+
+		if (!isset($_POST['action'])) {
+			return False;
+		}
+
+		$action = $_POST['action'];
+		if (!array_key_exists($action, $reference)) {
+			return False;
+		}
+
+		return $reference[$action]();
+	}
+}
+
+class TemplateBuilder implements ResponseBuilderInterface {
+	protected $templates = [];
+	protected $templates_data = [];
+	protected $template_count = 0;
+
+	protected $response_code = 200;
+
+	public function __construct() {
+
+	}
+
+	public function add_template($filename, $data) {
+		if (is_string($filename)) {
+			$tmp = new Template();
+			if (!$tmp->set_template_file($filename)) {
+				return False;
+			}
+		} elseif ($filename instanceof TemplateInterface) {
+			$tmp = $filename;
+		} else {
+			return False;
+		}
+
+		$this->templates[$this->template_count] = $tmp;
+		$this->templates_data[$this->template_count] = $data;
+		$this->template_count += 1;
+	}
+
+	public function set_response_code($code) {
+		$this->response_code = $code;
+	}
+
+	public function generate() {
+		http_response_code($this->response_code);
+
+		foreach ($this->templates as $n => &$template) {
+			$template->generate($this->templates_data[$n]);
+		}
+	}
+
+}
+
+interface TemplateInterface {
+	public function generate($data);
+}
+
+class Template implements TemplateInterface {
+	protected $template_dir = "/templates/";
+	protected $template_path = "";
+	protected $nest_extract = [];
+
+	public function __construct() {
+
+	}
+
+	public function set_template_file($filename) {
+		$dir = $_SERVER["DOCUMENT_ROOT"] . $this->template_dir;
+		$path = $dir . $filename;
+		if (file_exists($path) && is_readable($path)) {
+			$this->template_path = $path;
+			return True;
+		} else {
+			return False;
+		}
+	}
+
+	public function generate($data) {
+		extract($this->nest_extract);
+		$this->nest_extract = $data;
+		extract($this->nest_extract);
+
+		if ($this->template_path != "") {
+			include $this->template_path;
+		}
+	}
+
+	protected function nest($filename, $data) { // input there should be correct
+		$temp = new Template();
+		$temp->set_template_file($filename);
+		$temp->generate($data);
 	}
 }
 ?>
