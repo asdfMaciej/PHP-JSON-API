@@ -198,7 +198,7 @@ class APIBuilder {
 			$this->logger->uid = $this->auth_user->id;
 
 			if (intval($this->auth_user->active) == 0 && $this->require_active) {
-				return [405, "Inactive account."];
+				return [405, "Inactive account. Contact the administrator."];
 			}
 			if (intval($this->auth_user->admin) == 0 && $this->require_admin) {
 				return [403, "Administrator permission required."];
@@ -234,11 +234,11 @@ class WebBuilder extends APIBuilder {
 	public $top_message = "";
 	public $top_message_code = 200;
 
-	protected $f_head = "head.php";
-	protected $f_header_msg = "header_message.php";
-	protected $f_header = "header.php";
-	protected $f_foot = "foot.php";
-	protected $f_footer = "footer.php";
+	protected $f_head = "template/head.php";
+	protected $f_header_msg = "template/header_message.php";
+	protected $f_header = "template/header.php";
+	protected $f_foot = "template/foot.php";
+	protected $f_footer = "template/footer.php";
 
 	public function __construct() {
 		parent::__construct();
@@ -280,7 +280,7 @@ class WebBuilder extends APIBuilder {
 		$auth = $this->authenticate();
 		if ($auth !== True) {
 			$this->logger->log(False);
-			return False;
+			return $auth;
 		}
 
 		$this->logger->log(True);
@@ -319,11 +319,14 @@ class WebBuilder extends APIBuilder {
 			"user" => $user
 		]);
 
-		if ($ret_val == False) {
-			$this->response_builder->add_template("403.php", []);
+		if ($ret_val !== True) {
+			$this->response_builder->add_template("codes/generic.php", [
+				"code" => $ret_val[0],
+				"message" => $ret_val[1]
+			]);
 			$this->render();
 		}
-		return $ret_val;
+		return $ret_val === True;
 	}
 
 	public function set_title($t) {

@@ -1,5 +1,5 @@
 <?php
-namespace API\Users;
+namespace Web\Pages;
 use Boilerplate\User;
 use \PDO;
 
@@ -23,7 +23,7 @@ class Index extends \WebBuilder {
 	}
 
 	public function run() {
-		$this->response_builder->add_template("404.php", []);
+		$this->response_builder->add_template("codes/404.php", []);
 		$this->render();
 	}
 }

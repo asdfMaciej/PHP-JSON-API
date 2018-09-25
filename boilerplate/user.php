@@ -146,6 +146,13 @@ class User {
 		$statement->bindParam(':last_name', $this->last_name);
 
 		$statement->execute();
+
+		$uid_q = "SELECT * FROM $this->table WHERE nick = :nick";
+		$uid_s = $this->db->prepare($uid_q);
+		$uid_s->bindParam(':nick', $this->nick);
+		$uid_s->execute();
+
+		$this->id = $uid_s->fetch(PDO::FETCH_ASSOC)["id"];
 		return True;
 	}
 

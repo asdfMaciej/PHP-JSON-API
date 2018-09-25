@@ -6,15 +6,39 @@ div#footer, div#header {
 	background-color: #FF6D00;
 	color: #F0F0F0 !important;
 }
+div#sidebar {
+	background-color: #F80012;
+	color: #F0F0F0 !important;
+}
+a.white, a.white:hover, a.white:active, a.white:visited {
+	color: #F0F0F0 !important;
+}
 div.footer_bottom {
 	background-color: #212121 !important;
 }
 html {
 	height: 100%;
 }
+body {
+	height: 100%;
+}
+div#main_container {
+	display: block;
+	width: 100%;
+	margin: 0;
+}
 div#content {
 	flex: 1 0 auto;
 	padding: 1%;
+	margin-left: 200px;
+}
+div#sidebar {
+	width: 184px;
+	float: left;
+	height: 100%;
+	font-size: 100%;
+	text-align: center;
+	padding: 8px;
 }
 div#add_form {
 	text-align: center;

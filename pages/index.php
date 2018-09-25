@@ -1,5 +1,5 @@
 <?php
-namespace API\Users;
+namespace Web\Pages;
 use Boilerplate\User;
 use \PDO;
 
@@ -17,8 +17,8 @@ class Index extends \WebBuilder {
 
 	public function __construct() {
 		parent::__construct();
-		$this->require_token = 0;
-		$this->require_active = 0;
+		$this->require_token = 1;
+		$this->require_active = 1;
 		$this->require_admin = 0;
 
 		$this->functions_map = [
@@ -44,9 +44,13 @@ class Index extends \WebBuilder {
 		$this->response_builder->add_template("list_items.php", [
 			"items" => [123, 1525, 5351351, 14]
 		]);
-		$this->response_builder->add_template("forms/login.php", [
-			"user" => $this->get_user()
+		$this->response_builder->add_template("messages/index_welcome.php", [
+			"date" => date('d M Y'),
+			"day" => date('w')
 		]);
+		//$this->response_builder->add_template("forms/login.php", [
+		//	"user" => $this->get_user()
+		//]);
 		
 		$this->render();
 	}

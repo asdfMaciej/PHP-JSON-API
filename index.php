@@ -6,9 +6,13 @@ $pages = [
 	"" => "pages/index.php",
 	"/" => "pages/index.php",
 	"404" => "pages/404.php",
+	"register" => "pages/register.php",
 	"admin" => [
-		"index" => "pages/admin.php"
-	]
+		"index" => "pages/admin.php",
+		"panel" => "pages/admin.php",
+		"logs" => "pages/admin_logs.php"
+	],
+	"profile" => "pages/profile.php"
 ];
 
 $iter_pages = $pages;
