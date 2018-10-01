@@ -20,6 +20,10 @@ class User {
 	public $last_name = "";
 	public $auth_token = "";
 
+	public $teacher = False;
+	public $class_id = -1;
+	public $class_name = "";
+
 	public function __construct($db) {
 		$this->db_class = $db;
 		$this->db = $this->db_class->getConnection();
@@ -27,7 +31,13 @@ class User {
 	}
 
 	public function get_all() {
-		$query = "SELECT * from $this->table";
+		$class_table = $this->db_class->get_table_name("classes");
+		$query = "
+			SELECT us.*, cl.name AS class_name 
+			FROM $this->table AS us
+			LEFT JOIN $class_table AS cl
+				ON cl.id = us.class_id
+		";
 		$statement = $this->db->prepare($query);
 		$statement->execute();
 
@@ -57,7 +67,14 @@ class User {
 	public function remove_admin() {return $this->change_row("admin", 0, "Removing admin permission");}
 
 	public function get_matching_user($self_assign=False) {
-		$query = "SELECT * from $this->table WHERE email = :email OR nick = :nick OR id = :id";
+		$class_table = $this->db_class->get_table_name("classes");
+		$query = "
+			SELECT us.*, cl.name AS class_name 
+				FROM $this->table AS us
+			LEFT JOIN $class_table AS cl 
+				ON cl.id = us.class_id
+			WHERE us.email = :email OR us.nick = :nick OR us.id = :id
+		";
 		$statement = $this->db->prepare($query);
 		$statement->bindParam(':email', $this->email);
 		$statement->bindParam(':nick', $this->nick);
@@ -80,8 +97,31 @@ class User {
 			$this->register_timestamp = $row["register_timestamp"];
 			$this->first_name = $row["first_name"];
 			$this->last_name = $row["last_name"];
+			$this->teacher = $row["teacher"];
+			$this->class_id = $row["class_id"];
+			$this->class_name = $row["class_name"];
 		}
 		return True;
+	}
+
+	public function get_class_users($class_id) {
+		$class_table = $this->db_class->get_table_name("classes");
+		$query = "
+			SELECT us.*, cl.name AS class_name
+				FROM $class_table AS cl
+			LEFT JOIN $this->table AS us 
+				ON cl.id = us.class_id
+			WHERE cl.id = :class_id
+		";
+		$statement = $this->db->prepare($query);
+		$statement->bindParam(':class_id', $class_id);
+		$statement->execute();
+
+		if ($statement->rowCount() == 0) {
+			return [];
+		}
+
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	public function get_friends() {

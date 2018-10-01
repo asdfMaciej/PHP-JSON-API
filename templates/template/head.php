@@ -6,7 +6,7 @@
 		<?php foreach ($stylesheets as $style): ?>
 		<link rel="stylesheet" type="text/css" href="<?=$style?>">
 		<?php endforeach ?>
-		<script src="../javascript/jquery-3.3.1.min.js"></script>
-		<script src="../javascript/align.js"></script>
+		<script src="/javascript/jquery-3.3.1.min.js"></script>
+		<script src="/javascript/align.js"></script>
 	</head>
 	<body>

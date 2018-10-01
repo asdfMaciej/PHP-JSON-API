@@ -12,6 +12,26 @@ $pages = [
 		"panel" => "pages/admin.php",
 		"logs" => "pages/admin_logs.php"
 	],
+	"class" => [
+		"index" => "pages/class_index.php",
+		"/" => "pages/class_index.php",
+		"" => "pages/class_index.php",
+		"*" => "pages/class_index.php"
+	],
+	"posts" => [
+		"class" => [
+			"index" => "pages/posts_index.php",
+			"/" => "pages/posts_index.php",
+			"" => "pages/posts_index.php",
+			"*" => "pages/posts_index.php"
+		],
+		"view" => [
+			"index" => "pages/posts_view.php",
+			"/" => "pages/posts_view.php",
+			"" => "pages/posts_view.php",
+			"*" => "pages/posts_view.php"
+		]
+	],
 	"profile" => "pages/profile.php"
 ];
 
@@ -24,11 +44,12 @@ while (True) {
 	if (sizeof($path_levels) <= $depth) {
 		if (array_key_exists("index", $iter_pages)) {
 			require $iter_pages["index"];
-			break;
+		} elseif (array_key_exists("*", $iter_pages)) {
+			require $iter_pages["*"];
 		} else {
 			require $pages["404"];
-			break;
 		}
+		break;
 	}
 
 	$_p = $path_levels[$depth];
@@ -44,11 +65,15 @@ while (True) {
 	} elseif ($_p == "" || $_p == "/") {
 		if (array_key_exists("index", $iter_pages)) {
 			require $iter_pages["index"];
-			break;
+		} elseif (array_key_exists("*", $iter_pages)) {
+			require $iter_pages["*"];
 		} else {
 			require $pages["404"];
-			break;
 		}
+		break;
+	} elseif (array_key_exists("*", $iter_pages)) {
+		require $iter_pages["*"];
+		break;
 	} else {
 		require $pages["404"];
 		break;

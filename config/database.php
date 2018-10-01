@@ -12,12 +12,14 @@ class DBClass {
 		"friendships" => "friendships",
 		"authentication" => "sessions",
 		"logs" => "logs",
-		"requests" => "requests"
+		"requests" => "requests",
+		"classes" => "classes",
+		"posts" => "posts"
 	];
 
 	protected $table_user_columns = [
 		"users" => [
-			"id", "nick", "email", "active", "first_name", "last_name"
+			"id", "nick", "email", "class_id", "teacher", "active", "first_name", "last_name"
 		],
 		"friendships" => [
 			"id", "uid1", "uid2", "create_timestamp", "relationship"
@@ -30,12 +32,20 @@ class DBClass {
 		],
 		"requests" => [
 			"id", "uid_sender", "uid_receiver", "create_timestamp", "relationship"
+		],
+		"classes" => [
+			"id", "name"
+		],
+		"posts" => [
+			"id", "author_id", "class_id", "create_timestamp",
+			"title", "text", "text_formatted", "edit_timestamp",
+			"deleted"
 		]
 	];
 
 	protected $table_columns = [
 		"users" => [
-			"id", "nick", "password", "email", "register_ip", 
+			"id", "nick", "password", "email", "class_id", "teacher", "register_ip", 
 			"active", "admin", "first_name", "last_name", "register_timestamp"
 		],
 		"friendships" => [
@@ -49,6 +59,14 @@ class DBClass {
 		],
 		"requests" => [
 			"id", "uid_sender", "uid_receiver", "create_timestamp", "relationship"
+		],
+		"classes" => [
+			"id", "name"
+		],
+		"posts" => [
+			"id", "author_id", "class_id", "create_timestamp",
+			"title", "text", "text_formatted", "edit_timestamp",
+			"deleted"
 		]
 	];
 

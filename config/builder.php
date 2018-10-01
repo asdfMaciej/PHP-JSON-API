@@ -295,7 +295,7 @@ class WebBuilder extends APIBuilder {
 		$this->response_builder->add_template($this->f_head, [
 			"title" => $this->title,
 			"stylesheets" => [
-				"../style/style.css"
+				"/style/style.css"
 			]
 		]);
 

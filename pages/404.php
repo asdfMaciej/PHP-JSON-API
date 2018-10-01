@@ -8,7 +8,7 @@ include_once $_SERVER["DOCUMENT_ROOT"] . "/config/functions.php";
 include_once $_SERVER["DOCUMENT_ROOT"] . "/config/builder.php";
 include_once $_SERVER["DOCUMENT_ROOT"] . "/boilerplate/user.php";
 
-
+session_start();
 class Index extends \WebBuilder {
 	public function __construct() {
 		parent::__construct();

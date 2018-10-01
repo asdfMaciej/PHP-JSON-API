@@ -1,12 +1,14 @@
 <?php
 namespace Web\Pages;
 use Boilerplate\User;
+use Boilerplate\Classes;
 use \PDO;
 
 include_once $_SERVER["DOCUMENT_ROOT"] . "/config/database.php";
 include_once $_SERVER["DOCUMENT_ROOT"] . "/config/functions.php";
 include_once $_SERVER["DOCUMENT_ROOT"] . "/config/builder.php";
 include_once $_SERVER["DOCUMENT_ROOT"] . "/boilerplate/user.php";
+include_once $_SERVER["DOCUMENT_ROOT"] . "/boilerplate/classes.php";
 
 session_start();
 class AdminRoot extends \WebBuilder {
@@ -22,7 +24,10 @@ class AdminRoot extends \WebBuilder {
 			"delete" => [$this, "on_delete"],
 			"activate" => [$this, "on_activate"],
 			"deactivate" => [$this, "on_deactivate"],
-			"rename" => [$this, "on_rename"]
+			"rename" => [$this, "on_rename"],
+			"teacher" => [$this, "on_teacher"],
+			"deteacher" => [$this, "on_deteacher"],
+			"class" => [$this, "on_class"]
 		];
 		$auth = $this->authenticate();
 
@@ -42,8 +47,10 @@ class AdminRoot extends \WebBuilder {
 
 	public function run() {
 		$user_t = new User($this->database_class);
+		$class_t = new Classes($this->database_class);
 		$users = $user_t->get_all_rows();
-		$this->response_builder->add_template("admin/panel.php", ["users" => $users]);
+		$classes = $class_t->get_all_rows();
+		$this->response_builder->add_template("admin/panel.php", ["users" => $users, "classes" => $classes]);
 		$this->render();
 	}
 
@@ -69,6 +76,14 @@ class AdminRoot extends \WebBuilder {
 		return $this->_query("UPDATE users SET active = 0 WHERE id = :uid", "Deaktywowano podane konta");
 	}
 
+	protected function on_teacher() {
+		return $this->_query("UPDATE users SET teacher = 1 WHERE id = :uid", "Nadano uprawnienia nauczyciela.");
+	}
+
+	protected function on_deteacher() {
+		return $this->_query("UPDATE users SET teacher = 0 WHERE id = :uid", "Zabrano uprawnienia nauczyciela.");
+	}
+
 	protected function on_rename() {
 		$uids = $this->retrieve("user_id") ?? [];
 		$fname = $this->retrieve("fname");
@@ -81,7 +96,20 @@ class AdminRoot extends \WebBuilder {
 			$statement->bindParam(":lname", $lname);
 			$statement->execute();
 		}
-		return [200, "a"];
+		return [200, "Zmieniono nazwy użytkowników."];
+	}
+
+	protected function on_class() {
+		$uids = $this->retrieve("user_id") ?? [];
+		$_class = $this->retrieve("class");
+		$query = "UPDATE users SET class_id = :cl_id WHERE id = :uid";
+		$statement = $this->database->prepare($query);
+		foreach ((array) $uids as $uid) {
+			$statement->bindParam(":uid", $uid);
+			$statement->bindParam(":cl_id", $_class);
+			$statement->execute();
+		}
+		return [200, "Zmieniono klasy użytkowników."];
 	}
 }
 
