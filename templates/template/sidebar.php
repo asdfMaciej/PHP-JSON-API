@@ -8,7 +8,8 @@
 	<span style="font-size: 125%">Klasa <?=$user->class_name?>:</span>
 	<ul style="padding: 0; padding-left: 24px">
 		<li><a href="/class/<?=$user->class_id?>" class="white">Profil klasy</a></li><br>
-		<li><a href="/posts/class/<?=$user->class_id?>" class="white">Posty</a></li>
+		<li><a href="/posts/class/<?=$user->class_id?>" class="white">Posty</a></li><br>
+		<li><a href="/posts/add" class="white">Dodaj post</a></li>
 	</ul>
 <?php endif ?>
 

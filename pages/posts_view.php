@@ -25,7 +25,7 @@ class PostsView extends \WebBuilder {
 	public function __construct() {
 		parent::__construct();
 		$this->require_token = 1;
-		$this->require_active = 0;
+		$this->require_active = 1;
 		$this->require_admin = 0;
 
 		$success = $this->init();
@@ -61,7 +61,6 @@ class PostsView extends \WebBuilder {
 		$pos->id = $this->post_id;
 		$pos->class_id = $this->class_id;
 		$cl_post = $pos->get_post();
-
 		
 		$this->response_builder->add_template("messages/posts_view.php", [
 			"user" => $this->auth_user,

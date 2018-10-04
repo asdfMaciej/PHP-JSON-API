@@ -32,7 +32,94 @@ class Post {
 		return $statement;
 	}
 
-	public function get_post() {
+	public function delete() {
+		$query = "DELETE FROM $this->table WHERE id = :id";
+		$statement = $this->db->prepare($query);
+		$statement->bindParam(':id', $this->id);
+		$statement->execute();
+		return True;
+	}
+
+	public function update_by_id() {
+		$valid = True;
+		$valid = $valid && validate_post_title($this->title);
+		$valid = $valid && validate_post_text($this->text);
+		$valid = $valid && filter_var($this->class_id, FILTER_VALIDATE_INT) !== false;
+		$valid = $valid && filter_var($this->id, FILTER_VALIDATE_INT) !== false;
+		if (!$valid) {
+			return "Złe zapytanie.";
+		}
+
+		$this->edit_timestamp = date_timestamp_get(date_create());
+		$this->text_formatted = markdown($this->text);
+		if ($this->text_formatted === 0) {
+			return "Za długi post [>100 linijek]";
+		}
+
+		$query = "UPDATE $this->table "
+			. "SET edit_timestamp = :edit_timestamp, "
+			. "text = :text, text_formatted = :text_formatted, "
+			. "title = :title, class_id = :class_id "
+			. "WHERE id = :id";
+
+		$statement = $this->db->prepare($query);
+		$statement->bindParam(':class_id', $this->class_id);
+		$statement->bindParam(':id', $this->id);
+		$statement->bindParam(':title', $this->title);
+		$statement->bindParam(':text', $this->text);
+		$statement->bindParam(':edit_timestamp', $this->edit_timestamp);
+		$statement->bindParam(':text_formatted', $this->text_formatted);
+
+		$statement->execute();
+		return True;
+	}
+
+	public function create_new() {
+		$valid = True;
+		$valid = $valid && validate_post_title($this->title);
+		$valid = $valid && validate_post_text($this->text);
+		$valid = $valid && filter_var($this->author_id, FILTER_VALIDATE_INT) !== false;
+		$valid = $valid && filter_var($this->class_id, FILTER_VALIDATE_INT) !== false;
+
+		if (!$valid) {
+			return "Złe zapytanie.";
+		}
+
+		$this->create_timestamp = date_timestamp_get(date_create());
+		$this->edit_timestamp = 0;
+		$this->text_formatted = markdown($this->text);
+		if ($this->text_formatted === 0) {
+			return "Za długi post [>100 linijek]";
+		}
+
+		$query = "INSERT INTO $this->table "
+				. "(`author_id`, `class_id`, `create_timestamp`, `edit_timestamp`, "
+				. "`title`, `text`, `text_formatted`)"
+				. " VALUES "
+				. "(:author_id, :class_id, :create_timestamp, :edit_timestamp, "
+				. ":title, :text, :text_formatted)";
+
+		$statement = $this->db->prepare($query);
+		$statement->bindParam(':author_id', $this->author_id);
+		$statement->bindParam(':class_id', $this->class_id);
+		$statement->bindParam(':title', $this->title);
+		$statement->bindParam(':text', $this->text);
+		$statement->bindParam(':create_timestamp', $this->create_timestamp);
+		$statement->bindParam(':edit_timestamp', $this->edit_timestamp);
+		$statement->bindParam(':text_formatted', $this->text_formatted);
+
+		$statement->execute();
+
+		$uid_q = "SELECT * FROM $this->table WHERE `text` = :text ORDER BY id DESC";
+		$uid_s = $this->db->prepare($uid_q);
+		$uid_s->bindParam(':text', $this->text);
+		$uid_s->execute();
+
+		$this->id = $uid_s->fetch(PDO::FETCH_ASSOC)["id"];
+		return True;
+	}
+
+	public function get_post($_author_id=-1) {  // TO-DO: zmienic author_id todo
 		$users = $this->db_class->get_table_name("users");
 		$classes = $this->db_class->get_table_name("classes");
 		$query = "
@@ -54,10 +141,16 @@ class Post {
 		if ($this->class_id !== -1) {
 			$query .= " AND ps.class_id = :class_id";
 		}
+		if ($_author_id !== -1) {
+			$query .= " AND ps.author_id = :author_id";
+		}
 		$statement = $this->db->prepare($query);
 		$statement->bindParam(':id', $this->id);
 		if ($this->class_id !== -1) {
 			$statement->bindParam(':class_id', $this->class_id);
+		}
+		if ($_author_id !== -1) {
+			$statement->bindParam(':author_id', $_author_id);
 		}
 		$statement->execute();
 
@@ -86,7 +179,7 @@ class Post {
 		return True;
 	}
 
-	public function get_class_posts() {
+	public function get_class_posts($after=0, $limit=0) {
 		$users = $this->db_class->get_table_name("users");
 		$classes = $this->db_class->get_table_name("classes");
 		$query = "
@@ -106,9 +199,18 @@ class Post {
 			WHERE 
 				ps.class_id = :class_id AND
 				ps.deleted = 0
+			ORDER BY ps.id desc
 		";
+		if ($limit) {
+			$query .= " LIMIT :limit ";
+		}
+		$query .= " OFFSET :after ";
 		$statement = $this->db->prepare($query);
 		$statement->bindParam(':class_id', $this->class_id);
+		$statement->bindParam(':after', $after, PDO::PARAM_INT);
+		if ($limit) {
+			$statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+		}
 		$statement->execute();
 
 		if ($statement->rowCount() == 0) {

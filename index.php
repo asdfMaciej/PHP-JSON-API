@@ -30,7 +30,21 @@ $pages = [
 			"/" => "pages/posts_view.php",
 			"" => "pages/posts_view.php",
 			"*" => "pages/posts_view.php"
+		],
+		"add" => [
+			"index" => "pages/posts_add.php",
+			"/" => "pages/posts_add.php",
+			"" => "pages/posts_add.php",
+		],
+		"edit" => [
+			"/" => "pages/posts_add.php",
+			"" => "pages/posts_add.php",
+			"*" => "pages/posts_add.php"
+		],
+		"delete" => [
+			"*" => "pages/posts_delete.php"
 		]
+
 	],
 	"profile" => "pages/profile.php"
 ];

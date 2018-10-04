@@ -17,14 +17,14 @@ session_start();
 class PostsIndex extends \WebBuilder {
 	private $login_get = "login";
 	private $password_get = "password";
-	protected $get_method = "post";
+	protected $get_method = "get";
 
 	protected $url_path = [];
 	protected $class_id = 0;
 	public function __construct() {
 		parent::__construct();
 		$this->require_token = 1;
-		$this->require_active = 0;
+		$this->require_active = 1;
 		$this->require_admin = 0;
 
 		$success = $this->init();
@@ -64,9 +64,12 @@ class PostsIndex extends \WebBuilder {
 			return;
 		}
 
+		$after = $this->retrieve("after");
+		if ($after == "") {$after = 0;}
+
 		$pos = new Post($this->database_class);
 		$pos->class_id = $this->class_id;
-		$cl_posts = $pos->get_class_posts();
+		$cl_posts = $pos->get_class_posts($after, 10);
 
 		/*if ($cl_posts != True) {
 			$this->f400();
@@ -76,6 +79,7 @@ class PostsIndex extends \WebBuilder {
 		$this->response_builder->add_template("messages/posts_index.php", [
 			"user" => $this->auth_user,
 			"posts" => $cl_posts,
+			"after" => $after
 		]);
 		//var_dump($cl_posts);
 		$this->render();

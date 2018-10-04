@@ -1,5 +1,5 @@
 <?php if ($user): ?>
-	<form action="." method="post">
+	<form action="/" method="post">
 		<input type="hidden" name="action" value="logout">
 
 		<label>Wyloguj się: <input type="submit"></label>

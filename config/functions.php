@@ -37,8 +37,17 @@ function validate_fname($name) {
 	}
 	return $valid;
 }
+
 function validate_password($password) {
 	return strlen($password) <= 32 && strlen($password) >= 6;
+}
+
+function validate_post_title($title) {
+	return strlen($title) <= 160 && strlen($title) >= 12;
+}
+
+function validate_post_text($text) {
+	return strlen($text) <= 5500 && strlen($text) >= 16;
 }
 
 function validate_email($email) {  // i dont remember the php standard library, it's quite big
@@ -76,4 +85,65 @@ function retrieve($method, $string) {
 function json($str) {
 	return json_encode($str, JSON_UNESCAPED_SLASHES);
 }
+
+function split($string) {
+	$array = preg_split("/\r\n|\n|\r/", $string);
+	return $array;
+}
+
+function markdown($string) {
+	// it's not exactly markdown
+	// but it should do its job (prove me wrong)
+	// ~ Maciej Kaszkowiak, 27.05.2018
+	$string = htmlspecialchars($string);
+	$lines = split($string);
+	if (count($lines) > 100) {
+		return 0;
+	}
+	$html = "";
+	foreach ($lines as $line) {
+		$h2 = 0;
+		$newline = 1;
+		if (substr($line, 0, 2) == "# ") {
+			$html .= "<h2>";
+			$h2 = 1;
+			$newline = 0;
+			$line = substr($line, 2);
+		}
+		if (substr($line, 0, 3) == "---") {
+			$html .= "<hr>";
+			$newline = 0;
+			$line = substr($line, 3);
+		}
+		$html .= $line;
+		if ($h2) {
+			$html .= "</h2>";
+		}
+		if ($newline) {
+			$html .=  "<br>";
+		}
+		$html .= "\n";
+	}
+	$bold_lines = explode("**", $html);
+	if (count($bold_lines) < 3) {
+		return $html;
+	}
+	$html = "";
+	$opened = 0;
+	foreach ($bold_lines as $line) {
+		$html .= $line;
+		if (!$opened) {
+			$html .= "<b>";
+			$opened = 1;
+		} else {
+			$html .= "</b>";
+			$opened = 0;
+		}
+	}
+	if ($opened) {
+		$html = substr($html, 0, -3);
+	}
+	return $html;
+}
+
 ?>

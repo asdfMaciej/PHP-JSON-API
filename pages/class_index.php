@@ -22,7 +22,7 @@ class ClassMain extends \WebBuilder {
 	public function __construct() {
 		parent::__construct();
 		$this->require_token = 1;
-		$this->require_active = 0;
+		$this->require_active = 1;
 		$this->require_admin = 0;
 
 		$success = $this->init();

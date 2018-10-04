@@ -1,3 +1,3 @@
 <h1>
-	<?=$message?> <?php if ($code):?> (<?=$code?>) <?php endif?>
+	<?=$message?> <?php if (isset($code)):?> (<?=$code?>) <?php endif?>
 </h1>
