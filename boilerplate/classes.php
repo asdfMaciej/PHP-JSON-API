@@ -10,6 +10,7 @@ class Classes {
 
 	public $id;
 	public $name;
+	public $lessons_class_id;
 
 	public function __construct($db) {
 		$this->db_class = $db;
@@ -42,6 +43,7 @@ class Classes {
 		$row = $statement->fetch(PDO::FETCH_ASSOC);  // we assume no collisions
 		$this->id = $row["id"];
 		$this->name = $row["name"];
+		$this->lessons_class_id = $row["lessons_class_id"];
 
 		return True;
 	}

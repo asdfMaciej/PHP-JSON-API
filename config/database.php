@@ -14,7 +14,8 @@ class DBClass {
 		"logs" => "logs",
 		"requests" => "requests",
 		"classes" => "classes",
-		"posts" => "posts"
+		"posts" => "posts",
+		"lessons" => "lessons"
 	];
 
 	protected $table_user_columns = [
@@ -34,7 +35,7 @@ class DBClass {
 			"id", "uid_sender", "uid_receiver", "create_timestamp", "relationship"
 		],
 		"classes" => [
-			"id", "name"
+			"id", "name", "lessons_class_id"
 		],
 		"posts" => [
 			"id", "author_id", "class_id", "create_timestamp",
@@ -61,7 +62,7 @@ class DBClass {
 			"id", "uid_sender", "uid_receiver", "create_timestamp", "relationship"
 		],
 		"classes" => [
-			"id", "name"
+			"id", "name", "lessons_class_id"
 		],
 		"posts" => [
 			"id", "author_id", "class_id", "create_timestamp",

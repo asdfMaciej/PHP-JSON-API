@@ -18,6 +18,27 @@ $pages = [
 		"" => "pages/class_index.php",
 		"*" => "pages/class_index.php"
 	],
+	"schedule" => [
+		"class" => [
+			"index" => "pages/class_schedule.php",
+			"/" => "pages/class_schedule.php",
+			"" => "pages/class_schedule.php",
+			"*" => "pages/class_schedule.php"
+		],
+		"teacher" => [
+			"index" => "pages/class_schedule.php",
+			"/" => "pages/class_schedule.php",
+			"" => "pages/class_schedule.php",
+			"*" => "pages/class_schedule.php"
+		],
+		"classroom" => [
+			"index" => "pages/class_schedule.php",
+			"/" => "pages/class_schedule.php",
+			"" => "pages/class_schedule.php",
+			"*" => "pages/class_schedule.php"
+		],
+		"list" => "pages/schedules_list.php"
+	],
 	"posts" => [
 		"class" => [
 			"index" => "pages/posts_index.php",

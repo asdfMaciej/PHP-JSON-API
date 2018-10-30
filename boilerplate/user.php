@@ -23,6 +23,7 @@ class User {
 	public $teacher = False;
 	public $class_id = -1;
 	public $class_name = "";
+	public $lessons_class_id = "";
 
 	public function __construct($db) {
 		$this->db_class = $db;
@@ -69,7 +70,7 @@ class User {
 	public function get_matching_user($self_assign=False) {
 		$class_table = $this->db_class->get_table_name("classes");
 		$query = "
-			SELECT us.*, cl.name AS class_name 
+			SELECT us.*, cl.name AS class_name, cl.lessons_class_id 
 				FROM $this->table AS us
 			LEFT JOIN $class_table AS cl 
 				ON cl.id = us.class_id
@@ -100,6 +101,7 @@ class User {
 			$this->teacher = $row["teacher"];
 			$this->class_id = $row["class_id"];
 			$this->class_name = $row["class_name"];
+			$this->lessons_class_id = $row["lessons_class_id"];
 		}
 		return True;
 	}
@@ -107,7 +109,7 @@ class User {
 	public function get_class_users($class_id) {
 		$class_table = $this->db_class->get_table_name("classes");
 		$query = "
-			SELECT us.*, cl.name AS class_name
+			SELECT us.*, cl.name AS class_name, lessons_class_id
 				FROM $class_table AS cl
 			LEFT JOIN $this->table AS us 
 				ON cl.id = us.class_id
