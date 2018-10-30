@@ -70,9 +70,38 @@ class ClassMain extends \WebBuilder {
 			return;
 		}
 
+		$day = date('w')-1;
+		$_days = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek"];
+		$days = ["", "", "", "", ""];
+		if ($day < 5 && $day >= 0) {
+			$days[$day] = $_days[$day];
+		}
+
+		$query = "SELECT * FROM lessons WHERE class_id = :class_id ORDER BY period ASC";
+		$stat = $this->database->prepare($query);
+		$stat->bindParam(':class_id', $this->auth_user->lessons_class_id);
+		
+		$stat->execute();
+		$lessons = $stat->fetchAll(PDO::FETCH_ASSOC);
+
+		if (count($lessons) > 0) {
+			$for_whom = $lessons[0]["class"];
+		}
+
+		$schedule = [1 => [], 2 => [], 3 => [], 4 => [], 5 => []];
+		foreach ($lessons as $l) {
+			if ($l["d_monday"]) {if (!isset($schedule[1][$l["period"]])) {$schedule[1][$l["period"]]=[];} $schedule[1][$l["period"]][] = $l;}
+			elseif ($l["d_tuesday"]) {if (!isset($schedule[2][$l["period"]])) {$schedule[2][$l["period"]]=[];} $schedule[2][$l["period"]][] = $l;}
+			elseif ($l["d_wednesday"]) {if (!isset($schedule[3][$l["period"]])) {$schedule[3][$l["period"]]=[];} $schedule[3][$l["period"]][] = $l;}
+			elseif ($l["d_thursday"]) {if (!isset($schedule[4][$l["period"]])) {$schedule[4][$l["period"]]=[];} $schedule[4][$l["period"]][] = $l;}
+			elseif ($l["d_friday"]) {if (!isset($schedule[5][$l["period"]])) {$schedule[5][$l["period"]]=[];} $schedule[5][$l["period"]][] = $l;}
+		}
+
 		$this->response_builder->add_template("messages/class_main.php", [
 			"user" => $this->auth_user,
 			"cl_users" => $cl_users,
+			"schedule" => $schedule,
+			"days" => $days
 		]);
 		$this->render();
 		

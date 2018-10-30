@@ -3,11 +3,11 @@ div#content, body, div.post_content, div.post_text {
 	color: #131516;
 }
 div#footer, div#header {
-	background-color: #FF6D00;
+	background-color: #E69512;
 	color: #F0F0F0 !important;
 }
 div#sidebar {
-	background-color: #F80012;
+	background-color: #0C4C6F;
 	color: #F0F0F0 !important;
 }
 a.white, a.white:hover, a.white:active, a.white:visited {
@@ -173,4 +173,37 @@ div.post_content {
 }
 div.flexcol {
 	flex-direction: column;
+}
+
+table.schedule {
+	margin: 0;
+	padding: 0;
+	
+	width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
+	font-size: calc(8px + .4vw);
+}
+table.schedule > tbody > tr > td {
+	margin: 0;
+	padding: 6px;
+	text-align: center;
+	height: 70px;
+	min-width: 10%;
+	border: 1px solid black;
+}
+table.schedule > tbody > tr > td > div:nth-child(even) {
+	background-color:rgba(0, 0, 0, 0.2);
+}
+table.schedule > tbody > tr > th {
+	height: 70px;
+	min-width: 70px;
+	padding: 6px;
+}
+table.schedule > tbody > tr.godziny > td{
+	border: 0;
+	background-color: #34888c;
+}
+table.schedule > tbody > tr > th {
+	background-color: #5bd0c8;
 }

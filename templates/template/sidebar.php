@@ -11,6 +11,12 @@
 		<li><a href="/posts/class/<?=$user->class_id?>" class="white">Posty</a></li><br>
 		<li><a href="/posts/add" class="white">Dodaj post</a></li>
 	</ul>
+	<hr>
+	<span style="font-size: 125%">Plan lekcji:</span>
+	<ul style="padding: 0; padding-left: 24px">
+		<li><a href="/schedule/class/<?=$user->lessons_class_id?>" class="white">Plan klasy</a></li><br>
+		<li><a href="/schedule/list" class="white">Lista planów</a></li><br>
+	</ul>
 <?php endif ?>
 
 <?php if ($user->admin ?? False): ?>
